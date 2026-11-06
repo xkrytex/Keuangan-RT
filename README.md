@@ -45,7 +45,8 @@ Biaya operasionalnya Rp 0: web statis di Vercel, backend di Google Apps Script, 
 - Satu formulir sederhana untuk mencatat jimpitan ke Kas Jimpitan, dengan nama petugas wajib diisi.
 
 **Berjalan otomatis**
-- Laporan bulan sebelumnya ditulis ke spreadsheet LAPORAN setiap tanggal 1 pukul 01.00.
+- Spreadsheet LAPORAN diperbarui setiap pagi pukul 05.00: bulan berjalan, dan bulan lalu selama bukunya belum ditutup.
+- Setiap laporan di spreadsheet sudah ditata untuk dicetak di A4 (kop, ringkasan, tabel per kas, kolom tanda tangan), dan bisa diunduh sebagai PDF dari tab Petunjuk.
 - Spreadsheet DATA dicadangkan setiap Minggu pukul 02.00. Yang disimpan 12 cadangan terakhir.
 
 ## Arsitektur
@@ -100,7 +101,8 @@ Datanya disimpan di dua spreadsheet. DATA berisi hash password dan log aktivitas
 │   ├── Auth.gs           Login, sesi, akun pengurus, PIN ronda
 │   ├── Transaksi.gs      Catat, batal, daftar, ringkasan, foto
 │   ├── Laporan.gs        Laporan bulanan dan tahunan, tutup buku, cadangan
-│   └── Setup.gs          Setup awal, admin pertama, pemulihan akses
+│   ├── Setup.gs          Setup awal, admin pertama, pemulihan akses, pemicu
+│   └── Demo.gs           Isi dan hapus data contoh untuk demo
 ├── web/                  Frontend statis (Root Directory di Vercel)
 │   ├── *.html            Beranda, transaksi, detail, laporan, pengurus, ronda
 │   ├── css/              Token desain, gaya utama, gaya cetak
@@ -125,8 +127,8 @@ Semua langkah ini dilakukan sambil masuk dengan akun Google RT.
 1. **Buat proyek.** Buka [script.google.com](https://script.google.com), klik **Proyek baru**, lalu beri nama `Kas RT 05 RW 02`. Di **Setelan proyek**, centang **Tampilkan file manifes "appsscript.json" di editor**.
 2. **Salin kode.**
    - Ganti isi `appsscript.json` dengan file yang sama dari folder `apps-script/`.
-   - Ganti nama file bawaan menjadi `Kode`, lalu buat file skrip `Auth`, `Laporan`, `Setup`, dan `Transaksi`.
-   - Isi kelima file dengan file bernama sama dari `apps-script/`, lalu simpan.
+   - Ganti nama file bawaan menjadi `Kode`, lalu buat file skrip `Auth`, `Laporan`, `Setup`, `Transaksi`, dan `Demo`.
+   - Isi keenam file dengan file bernama sama dari `apps-script/`, lalu simpan.
 3. **Jalankan `setupAwal`.** Buka file `Setup.gs` dulu, karena daftar fungsi di bilah atas hanya menampilkan fungsi dari file yang sedang dibuka. Pilih `setupAwal`, klik **Jalankan**, lalu izinkan aksesnya. Log menulis `Setup selesai.` dalam 10 sampai 30 detik.
    - Peringatan "Google belum memverifikasi aplikasi ini" wajar untuk skrip buatan sendiri: klik **Lanjutan**, lalu **Buka … (tidak aman)**.
    - Fungsi ini membuat folder di Drive berisi spreadsheet DATA dan LAPORAN, folder `Nota`, dan folder `Cadangan`, lalu memasang pemicu laporan bulanan dan cadangan mingguan.
@@ -171,11 +173,21 @@ Semua langkah ini dilakukan sambil masuk dengan akun Google RT.
 3. Di tab **Catat transaksi**, catat **saldo awal** setiap kas: jenis Pemasukan, kategori Saldo awal, dengan tanggal mulai pembukuan.
 4. Bagikan alamat web ke warga. Bagikan alamat `/ronda.html` dan PIN-nya ke koordinator ronda.
 
+### Data demo (opsional)
+
+Untuk memperkenalkan web ke warga sebelum pembukuan dimulai, buka `Demo.gs` di editor Apps Script, lalu jalankan **`isiDataDemo`**. Fungsi ini mengisi transaksi contoh untuk empat bulan terakhir (iuran, listrik lampu jalan, kegiatan 17 Agustus, jimpitan tiap malam), menutup buku bulan-bulan yang sudah lewat, dan menulis laporannya ke spreadsheet.
+
+- Selama data demo terpasang, setiap halaman web dan setiap laporan memuat tanda **"Data contoh untuk demo"**.
+- Fungsi ini menolak berjalan kalau pembukuan sungguhan sudah dimulai, yaitu kalau sudah ada saldo awal, transaksi sebelum bulan ini, atau riwayat tutup buku.
+- Sebelum mulai mencatat keuangan yang sebenarnya, jalankan **`hapusDataDemo`**. Yang dihapus hanya transaksi dan tutup buku demo. Akun pengurus, PIN ronda, dan transaksi asli tidak berubah.
+
 ## Memperbarui kode
 
 - **Backend.** Ubah file `.gs` di editor Apps Script. Lalu klik **Terapkan → Kelola deployment**, klik ikon pensil, pilih **Versi baru**, lalu **Terapkan**.
 
   Jangan membuat "Deployment baru", karena URL `/exec`-nya akan berubah. Kalau versi baru lupa diterapkan, web akan menampilkan pesan "Aksi tidak dikenal".
+
+  Setelah memperbarui dari versi yang masih memakai pemicu bulanan, jalankan **`pasangTrigger`** sekali dari `Setup.gs`. Untuk menata ulang semua tab laporan dengan format terbaru, jalankan **`tulisUlangSemuaLaporan`**.
 - **Frontend.** Push ke GitHub. Vercel memasang versi baru dalam 1 sampai 2 menit.
 
   Kalau skrip pendek di `<head>` (pemilih tema) diubah, perbarui juga hash `sha256-…` di `web/vercel.json`, karena CSP hanya menjalankan skrip yang hash-nya terdaftar. Skrip itu harus sama persis di keenam halaman. Hitung hash barunya dengan:
