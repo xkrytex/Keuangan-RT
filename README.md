@@ -127,7 +127,7 @@ Semua langkah ini dilakukan sambil masuk dengan akun Google RT.
    - Ganti isi `appsscript.json` dengan file yang sama dari folder `apps-script/`.
    - Ganti nama file bawaan menjadi `Kode`, lalu buat file skrip `Auth`, `Laporan`, `Setup`, dan `Transaksi`.
    - Isi kelima file dengan file bernama sama dari `apps-script/`, lalu simpan.
-3. **Jalankan `setupAwal`.** Pilih fungsi itu, klik **Jalankan**, lalu izinkan aksesnya.
+3. **Jalankan `setupAwal`.** Buka file `Setup.gs` dulu, karena daftar fungsi di bilah atas hanya menampilkan fungsi dari file yang sedang dibuka. Pilih `setupAwal`, klik **Jalankan**, lalu izinkan aksesnya. Log menulis `Setup selesai.` dalam 10 sampai 30 detik.
    - Peringatan "Google belum memverifikasi aplikasi ini" wajar untuk skrip buatan sendiri: klik **Lanjutan**, lalu **Buka … (tidak aman)**.
    - Fungsi ini membuat folder di Drive berisi spreadsheet DATA dan LAPORAN, folder `Nota`, dan folder `Cadangan`, lalu memasang pemicu laporan bulanan dan cadangan mingguan.
    - Catat alamat kedua spreadsheet dan **PIN ronda awal** dari Log eksekusi.
