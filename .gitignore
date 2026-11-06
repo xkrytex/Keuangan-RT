@@ -1,0 +1,26 @@
+# Konfigurasi asisten AI dan catatan audit internal
+.claude/
+CLAUDE.md
+anti-slop/
+
+# Node & Vercel
+node_modules/
+.vercel/
+
+# Apps Script CLI (berisi ID script)
+.clasp.json
+.clasprc.json
+
+# Sistem operasi & editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log
+
+# Dokumen kerja dan uji lokal (tidak dipublikasikan)
+PRD.md
+DESIGN.md
+PANDUAN-SETUP.md
+tests/
