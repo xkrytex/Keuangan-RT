@@ -85,7 +85,10 @@ function prosesPermintaan(isi) {
     } catch (err) {
       throw new GalatPengguna('Permintaan tidak valid.');
     }
-    return { ok: true, data: jalankan(req) };
+    const hasil = { ok: true, data: jalankan(req) };
+    // Web memasang tanda "data contoh" di setiap halaman selama data demo terpasang (lihat Demo.gs).
+    if (prop('MODE_DEMO') === '1') hasil.demo = true;
+    return hasil;
   } catch (err) {
     if (err instanceof GalatPengguna) return { ok: false, pesan: err.message, kode: err.kode };
     console.error(err && err.stack ? err.stack : err);

@@ -128,6 +128,13 @@ button:disabled, select:disabled { cursor: not-allowed; }
 
 .bagian { margin-top: var(--jarak-8); }
 
+/* Tampil selama data demo terpasang, di layar maupun hasil cetak. */
+.pita-demo {
+  margin: var(--jarak-4) 0 0; padding: var(--jarak-3) var(--jarak-4);
+  border: 1px solid var(--warna-bahaya); border-left-width: 4px; border-radius: var(--sudut-kecil);
+  background: var(--warna-permukaan);
+}
+
 /* Saldo: satu titik fokus berupa pita total, lalu tiga kas setara karena datanya sejenis dan sama penting. */
 .blok-saldo { min-height: 260px; }
 

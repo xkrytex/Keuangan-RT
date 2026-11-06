@@ -35,5 +35,18 @@ export async function panggil(aksi, data = {}, token) {
     throw new GalatApi('Jawaban server tidak terbaca. Coba lagi.');
   }
   if (!isi.ok) throw new GalatApi(isi.pesan || 'Permintaan ditolak server.', isi.kode);
+  if (isi.demo) tandaiDemo();
   return isi.data;
+}
+
+function tandaiDemo() {
+  if (document.getElementById('pita-demo')) return;
+  const pita = document.createElement('p');
+  pita.id = 'pita-demo';
+  pita.className = 'pita-demo';
+  pita.setAttribute('role', 'note');
+  const judul = document.createElement('strong');
+  judul.textContent = 'Data contoh untuk demo.';
+  pita.append(judul, ' Angka di web ini bukan keuangan RT yang sebenarnya.');
+  document.getElementById('isi')?.prepend(pita);
 }

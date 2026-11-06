@@ -49,6 +49,7 @@ body { background: #FFFFFF; color: #000000; font-size: 10pt; }
 .laporan-kategori { font-size: 8pt; }
 .laporan-catatan { margin: 0 0 4pt; font-size: 8.5pt; color: #000000; }
 .laporan-catatan a { color: #000000; }
+.pita-demo { margin: 0 0 8pt; padding: 4pt 6pt; border: 1pt solid #000000; border-radius: 0; font-size: 9pt; text-align: center; }
 .keadaan { padding: 4pt 0; border: 0; background: none; font-size: 9pt; }
 
 .ttd { margin-top: 24pt; break-inside: avoid; }
