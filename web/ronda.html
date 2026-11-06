@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catat Jimpitan · Kas RT 05 RW 02 Donglo Santren</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1F5C36">
+  <script>try { if (localStorage.getItem('tema') === 'gelap') document.documentElement.dataset.tema = 'gelap'; } catch (e) {}</script>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/tema.js"></script>
+  <script type="module" src="js/sesi.js"></script>
+  <script type="module" src="js/ronda.js"></script>
+</head>
+<body>
+  <a class="lewati" href="#isi">Langsung ke isi</a>
+  <header class="kepala">
+    <div class="wadah kepala-isi">
+      <a class="merek" href="./">
+        <span class="merek-logo" aria-hidden="true"></span>
+        <span class="merek-teks"><strong>Kas RT 05 RW 02</strong><span>Donglo Santren, Kedung Sugo</span></span>
+      </a>
+      <div class="kepala-aksi">
+        <button type="button" class="tombol-ikon tombol-keluar" id="tombol-keluar" hidden title="Keluar dari akun pengurus">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#keluar"></use></svg>
+          <span class="label-keluar">Keluar</span>
+        </button>
+        <button type="button" class="tombol-ikon tombol-tema" id="tombol-tema" aria-pressed="false" title="Mode gelap">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#bulan"></use></svg>
+          <span class="sr-only">Mode gelap</span>
+        </button>
+      </div>
+      <nav class="menu" aria-label="Menu utama">
+        <a href="./">Beranda</a>
+        <a href="transaksi.html">Transaksi</a>
+        <a href="laporan.html">Laporan</a>
+        <a href="admin.html">Pengurus</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="isi" class="wadah">
+    <section id="tampilan-pin" class="wadah-form" aria-labelledby="judul-pin">
+      <div class="judul-halaman">
+        <h1 id="judul-pin">Catat jimpitan</h1>
+        <p class="judul-keterangan">Khusus petugas ronda. Masukkan PIN ronda dari pengurus RT.</p>
+      </div>
+      <form id="form-pin" class="kartu-form" novalidate>
+        <div id="pesan-pin"></div>
+        <div class="kolom">
+          <label for="pin">PIN ronda (6 angka)</label>
+          <input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="input-pin" aria-describedby="pin-galat">
+          <p class="pesan-salah" id="pin-galat" hidden></p>
+        </div>
+        <button type="submit" class="tombol">Masuk</button>
+      </form>
+      <p class="catatan-bawah">Lupa PIN? Tanyakan ke Ketua RT atau Bendahara. PIN berlaku untuk semua petugas.</p>
+    </section>
+
+    <section id="tampilan-catat" class="wadah-form" hidden aria-labelledby="judul-catat">
+      <p class="bilah-sesi">
+        <span>Masuk sebagai <strong>petugas ronda</strong></span>
+        <button type="button" class="tombol-teks" id="keluar-ronda">Keluar</button>
+      </p>
+      <div class="judul-halaman">
+        <h1 id="judul-catat" tabindex="-1">Catat jimpitan</h1>
+        <p class="judul-keterangan">Jumlah uang jimpitan yang terkumpul dari kaleng warga dalam satu malam ronda.</p>
+      </div>
+      <form id="form-catat" class="kartu-form" novalidate>
+        <div id="pesan-catat"></div>
+        <fieldset class="pilihan-jenis pilihan-dua">
+          <legend>Ronda malam</legend>
+          <label><input type="radio" name="malam" value="0"> <span id="label-malam-0">Hari ini</span></label>
+          <label><input type="radio" name="malam" value="-1"> <span id="label-malam-1">Kemarin</span></label>
+        </fieldset>
+        <p class="bantuan bantuan-rapat">Kalau jimpitan dihitung lewat tengah malam, pilih malam sebelumnya.</p>
+
+        <div class="kolom">
+          <label for="catat-petugas">Nama petugas</label>
+          <input id="catat-petugas" type="text" maxlength="40" autocomplete="name" aria-describedby="catat-petugas-bantuan catat-petugas-galat">
+          <p class="bantuan" id="catat-petugas-bantuan">Nama Anda, atau beberapa nama petugas malam itu. Disimpan di HP ini untuk pencatatan berikutnya.</p>
+          <p class="pesan-salah" id="catat-petugas-galat" hidden></p>
+        </div>
+
+        <div class="kolom">
+          <label for="catat-nominal">Jumlah uang</label>
+          <div class="input-rupiah">
+            <span aria-hidden="true">Rp</span>
+            <input id="catat-nominal" type="text" inputmode="numeric" autocomplete="off" aria-describedby="catat-nominal-galat">
+          </div>
+          <p class="pesan-salah" id="catat-nominal-galat" hidden></p>
+        </div>
+
+        <button type="submit" class="tombol">Simpan jimpitan</button>
+      </form>
+      <p class="catatan-bawah">Salah catat? Hubungi pengurus RT untuk membatalkannya. Petugas ronda tidak bisa mengubah catatan.</p>
+    </section>
+  </main>
+
+  <footer class="kaki">
+    <div class="wadah">
+      <p>Buku kas RT 05 RW 02 Donglo Santren, Kedung Sugo.</p>
+      <p class="kaki-tautan"><a href="ronda.html">Petugas ronda: catat jimpitan</a></p>
+    </div>
+  </footer>
+</body>
+</html>

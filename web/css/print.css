@@ -1,0 +1,58 @@
+/* Cetak laporan: A4 potret, hitam-putih. Dimuat dengan media="print", jadi tidak memengaruhi tampilan layar. */
+@page { size: A4 portrait; margin: 15mm; }
+
+:root, :root[data-tema="gelap"] {
+  color-scheme: light;
+  --warna-latar: #FFFFFF;
+  --warna-permukaan: #FFFFFF;
+  --warna-teks: #000000;
+  --warna-teks-sekunder: #333333;
+  --warna-garis: #999999;
+  --warna-utama: #000000;
+  --warna-masuk: #000000;
+  --warna-keluar: #000000;
+}
+
+body { background: #FFFFFF; color: #000000; font-size: 10pt; }
+.kepala, .kaki, .lewati, .layar-saja { display: none !important; }
+.hanya-cetak { display: block; }
+.wadah { max-width: none; padding: 0; }
+
+.kop { display: flex; align-items: center; gap: 12pt; padding-bottom: 8pt; border-bottom: 2pt solid #000000; }
+.kop img { width: 48pt; height: 48pt; filter: grayscale(1) brightness(0.4); }
+.kop p { font-size: 11pt; }
+.kop .kop-judul { font-size: 13pt; font-weight: 800; letter-spacing: 0.02em; }
+
+.laporan { margin-top: 0; }
+.laporan-judul { margin-top: 12pt; font-size: 14pt; text-align: center; }
+.laporan-status { text-align: center; font-size: 9pt; }
+.laporan-total { margin-top: 8pt; padding: 0; background: none; color: #000000; border-radius: 0; text-align: center; }
+.laporan-total strong { display: inline; font-size: 11pt; }
+
+.laporan-kas { margin-top: 14pt; padding: 0; border: 0; border-radius: 0; }
+.laporan-kas-judul { font-size: 11pt; color: #000000; break-after: avoid; }
+.laporan-kas-judul .ikon { display: none; }
+.laporan-angka { grid-template-columns: repeat(4, 1fr); gap: 4pt; margin: 4pt 0 6pt; break-after: avoid; }
+.laporan-angka dt { font-size: 8.5pt; }
+.laporan-akhir dd { font-size: 10pt; }
+
+.tabel-gulir { overflow: visible; }
+.tabel-laporan { font-size: 9pt; }
+.tabel-laporan th, .tabel-laporan td { padding: 3pt 4pt; border: 0.5pt solid #000000; }
+.tabel-laporan th:first-child, .tabel-laporan td:first-child { padding-left: 4pt; }
+.tabel-laporan th:last-child, .tabel-laporan td:last-child { padding-right: 4pt; }
+.tabel-laporan thead th { color: #000000; background: #EEEEEE; }
+.tabel-laporan tfoot th, .tabel-laporan tfoot td { border: 0.5pt solid #000000; border-top: 1pt solid #000000; }
+.tabel-laporan tr { break-inside: avoid; }
+.laporan-tautan { min-height: 0; color: #000000; }
+.laporan-uraian { text-decoration: none; }
+.laporan-kategori { font-size: 8pt; }
+.laporan-catatan { margin: 0 0 4pt; font-size: 8.5pt; color: #000000; }
+.laporan-catatan a { color: #000000; }
+.keadaan { padding: 4pt 0; border: 0; background: none; font-size: 9pt; }
+
+.ttd { margin-top: 24pt; break-inside: avoid; }
+.ttd-tempat { text-align: right; }
+.ttd-baris { display: flex; justify-content: space-between; margin-top: 6pt; text-align: center; }
+.ttd-kolom { width: 40%; }
+.ttd-nama { margin-top: 48pt; }

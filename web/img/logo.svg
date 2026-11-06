@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="logo-judul">
+  <title id="logo-judul">Logo RT 05 RW 02 Donglo Santren</title>
+  <g fill="none" stroke="#1F5C36" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 54 L60 16 L110 54"/>
+    <rect x="14" y="66" width="15" height="36" rx="7.5"/>
+    <path d="M49 66 H37 L36 82 C38 80.6 40 80 42.4 80 C47 80 50 84.6 50 91 C50 97.6 46.6 102 42 102 C39 102 36.8 100.8 35 98.6"/>
+    <path d="M55.5 102 L62.5 66"/>
+    <rect x="68" y="66" width="15" height="36" rx="7.5"/>
+    <path d="M89 74.5 C89 69.4 92.4 66 97 66 C101.6 66 105 69.4 105 74.4 C105 79.6 101.6 83.4 97.6 87.6 L89 102 H105"/>
+  </g>
+</svg>

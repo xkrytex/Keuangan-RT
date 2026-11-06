@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pengurus · Kas RT 05 RW 02 Donglo Santren</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1F5C36">
+  <script>try { if (localStorage.getItem('tema') === 'gelap') document.documentElement.dataset.tema = 'gelap'; } catch (e) {}</script>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/tema.js"></script>
+  <script type="module" src="js/sesi.js"></script>
+  <script type="module" src="js/admin.js"></script>
+</head>
+<body>
+  <a class="lewati" href="#isi">Langsung ke isi</a>
+  <header class="kepala">
+    <div class="wadah kepala-isi">
+      <a class="merek" href="./">
+        <span class="merek-logo" aria-hidden="true"></span>
+        <span class="merek-teks"><strong>Kas RT 05 RW 02</strong><span>Donglo Santren, Kedung Sugo</span></span>
+      </a>
+      <div class="kepala-aksi">
+        <button type="button" class="tombol-ikon tombol-keluar" id="tombol-keluar" hidden title="Keluar dari akun pengurus">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#keluar"></use></svg>
+          <span class="label-keluar">Keluar</span>
+        </button>
+        <button type="button" class="tombol-ikon tombol-tema" id="tombol-tema" aria-pressed="false" title="Mode gelap">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#bulan"></use></svg>
+          <span class="sr-only">Mode gelap</span>
+        </button>
+      </div>
+      <nav class="menu" aria-label="Menu utama">
+        <a href="./">Beranda</a>
+        <a href="transaksi.html">Transaksi</a>
+        <a href="laporan.html">Laporan</a>
+        <a href="admin.html" aria-current="page">Pengurus</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="isi" class="wadah">
+    <p id="memeriksa" class="keadaan keadaan-awal">Memeriksa sesi…</p>
+
+    <section id="tampilan-masuk" class="wadah-form" hidden aria-labelledby="judul-masuk">
+      <div class="judul-halaman">
+        <h1 id="judul-masuk">Masuk pengurus</h1>
+        <p class="judul-keterangan">Khusus Ketua RT, Bendahara, Sekretaris, dan Ketua Karang Taruna.</p>
+      </div>
+      <form id="form-masuk" class="kartu-form" novalidate>
+        <div id="pesan-masuk"></div>
+        <div class="kolom">
+          <label for="masuk-username">Username</label>
+          <input id="masuk-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="masuk-username-galat">
+          <p class="pesan-salah" id="masuk-username-galat" hidden></p>
+        </div>
+        <div class="kolom">
+          <label for="masuk-password">Password</label>
+          <input id="masuk-password" name="password" type="password" autocomplete="current-password" aria-describedby="masuk-password-galat">
+          <p class="pesan-salah" id="masuk-password-galat" hidden></p>
+        </div>
+        <button type="submit" class="tombol">Masuk</button>
+      </form>
+      <p class="catatan-bawah">Lupa password? Minta pengurus lain mereset password Anda dari menu Akun.</p>
+      <a class="kartu-tautan" href="ronda.html">
+        <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#kas-jimpitan"></use></svg>
+        <span><strong>Petugas ronda?</strong> Catat jimpitan dengan PIN di sini.</span>
+      </a>
+    </section>
+
+    <section id="tampilan-ganti-wajib" class="wadah-form" hidden aria-labelledby="judul-ganti-wajib">
+      <div class="judul-halaman">
+        <h1 id="judul-ganti-wajib" tabindex="-1">Buat password baru</h1>
+        <p class="judul-keterangan">Anda masuk dengan password sementara. Ganti dulu dengan password pilihan Anda sendiri.</p>
+      </div>
+      <div id="wadah-ganti-wajib"></div>
+    </section>
+
+    <div id="tampilan-admin" hidden>
+      <p class="bilah-sesi">
+        <span>Masuk sebagai <strong id="nama-sesi"></strong></span>
+      </p>
+      <nav class="tab-pengurus" aria-label="Menu pengurus">
+        <a href="#catat" data-menu>Catat transaksi</a>
+        <a href="#buku" data-menu>Tutup buku</a>
+        <a href="#akun" data-menu>Akun dan pengurus</a>
+        <a href="#log" data-menu>Log aktivitas</a>
+      </nav>
+
+      <section id="catat" data-bagian aria-labelledby="judul-catat" hidden>
+        <div class="judul-halaman">
+          <h1 id="judul-catat" tabindex="-1">Catat transaksi</h1>
+          <p class="judul-keterangan">Transaksi yang salah tidak diedit. Buka menu <a href="transaksi.html">Transaksi</a>, tekan Batalkan dengan alasan, lalu catat ulang yang benar.</p>
+        </div>
+        <form id="form-catat" class="kartu-form" novalidate>
+          <div id="pesan-catat"></div>
+          <fieldset class="pilihan-jenis">
+            <legend>Jenis transaksi</legend>
+            <label><input type="radio" name="jenis" value="MASUK" checked> Pemasukan</label>
+            <label><input type="radio" name="jenis" value="KELUAR"> Pengeluaran</label>
+            <label><input type="radio" name="jenis" value="PINDAH"> Pindah kas</label>
+          </fieldset>
+
+          <div class="baris-kolom">
+            <div class="kolom">
+              <label for="catat-kas" id="label-kas">Kas</label>
+              <select id="catat-kas" aria-describedby="catat-kas-galat"></select>
+              <p class="pesan-salah" id="catat-kas-galat" hidden></p>
+            </div>
+            <div class="kolom" id="kolom-tujuan" hidden>
+              <label for="catat-tujuan">Ke kas</label>
+              <select id="catat-tujuan" aria-describedby="catat-tujuan-galat"></select>
+              <p class="pesan-salah" id="catat-tujuan-galat" hidden></p>
+            </div>
+            <div class="kolom" id="kolom-kategori">
+              <label for="catat-kategori">Kategori</label>
+              <select id="catat-kategori" aria-describedby="catat-kategori-galat"></select>
+              <p class="pesan-salah" id="catat-kategori-galat" hidden></p>
+            </div>
+          </div>
+          <p class="kotak-info" id="info-saldo-awal" hidden>Saldo awal adalah uang kas yang sudah ada sebelum web ini dipakai. Pilih tanggal paling awal, lalu catat transaksi lama setelahnya. Setiap kas hanya punya satu saldo awal.</p>
+
+          <div class="baris-kolom">
+            <div class="kolom">
+              <span class="label-kolom" id="label-tanggal">Tanggal transaksi</span>
+              <div class="pilih-tanggal" id="pilih-tanggal"></div>
+              <p class="bantuan" id="catat-tanggal-bantuan">Otomatis terisi hari ini. Ketuk untuk memilih hari lain kalau transaksinya sudah lewat.</p>
+              <p class="pesan-salah" id="catat-tanggal-galat" hidden></p>
+            </div>
+            <div class="kolom">
+              <label for="catat-nominal">Nominal</label>
+              <div class="input-rupiah">
+                <span aria-hidden="true">Rp</span>
+                <input id="catat-nominal" type="text" inputmode="numeric" autocomplete="off" aria-describedby="catat-nominal-galat">
+              </div>
+              <p class="pesan-salah" id="catat-nominal-galat" hidden></p>
+            </div>
+          </div>
+
+          <div class="kolom">
+            <label for="catat-uraian">Keterangan</label>
+            <input id="catat-uraian" type="text" maxlength="200" autocomplete="off" aria-describedby="catat-uraian-bantuan catat-uraian-galat">
+            <p class="bantuan" id="catat-uraian-bantuan">Tulis singkat dan jelas, misalnya "Iuran Kas RT November, 70 rumah".</p>
+            <p class="pesan-salah" id="catat-uraian-galat" hidden></p>
+          </div>
+
+          <div class="kolom">
+            <span class="label-kolom" id="label-foto">Bukti pembayaran (jika ada)</span>
+            <div id="unggah-foto" class="unggah-foto" aria-live="polite"></div>
+            <p class="bantuan">Foto struk, nota, atau kuitansi dalam format .jpg atau .png. Bukti ini bisa dilihat semua warga.</p>
+          </div>
+
+          <button type="submit" class="tombol" id="tombol-catat">Catat pemasukan</button>
+        </form>
+      </section>
+
+
+      <section id="buku" data-bagian aria-labelledby="judul-buku" hidden>
+        <div class="judul-halaman">
+          <h1 id="judul-buku" tabindex="-1">Tutup buku</h1>
+          <p class="judul-keterangan">Tutup buku mengunci transaksi satu bulan: tidak bisa ditambah atau dibatalkan lagi, jadi saldo awal bulan berikutnya pasti. Lakukan di awal bulan, setelah semua transaksi bulan lalu tercatat.</p>
+        </div>
+        <div id="buku-status" aria-live="polite"></div>
+
+        <section class="bagian" aria-labelledby="judul-riwayat-buku">
+          <h2 id="judul-riwayat-buku" class="judul-bagian">Riwayat tutup buku</h2>
+          <div id="buku-riwayat" aria-live="polite"></div>
+        </section>
+
+        <section class="bagian" aria-labelledby="judul-sheet">
+          <h2 id="judul-sheet" class="judul-bagian">Laporan di Google Sheets</h2>
+          <form id="form-sheet" class="kartu-form" novalidate>
+            <div id="pesan-sheet"></div>
+            <p class="bantuan">Laporan bulan lalu ditulis otomatis setiap tanggal 1, dan ditulis ulang setiap kali buku ditutup. Pakai tombol ini kalau tab laporan di spreadsheet terhapus atau perlu diperbarui.</p>
+            <div class="kolom">
+              <label for="sheet-bulan">Bulan</label>
+              <select id="sheet-bulan"></select>
+            </div>
+            <button type="submit" class="tombol tombol-sekunder">Tulis ulang laporan</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="akun" data-bagian aria-labelledby="judul-akun" hidden>
+        <div class="judul-halaman"><h1 id="judul-akun" tabindex="-1">Akun dan pengurus</h1></div>
+
+        <section class="bagian-kecil" aria-labelledby="judul-pengurus">
+          <h2 id="judul-pengurus" class="judul-bagian">Daftar pengurus</h2>
+          <div id="daftar-pengurus" aria-live="polite"></div>
+          <details class="lipatan">
+            <summary>Tambah pengurus</summary>
+            <form id="form-tambah" class="kartu-form" novalidate>
+              <div id="pesan-tambah"></div>
+              <div class="kolom">
+                <label for="tambah-nama">Nama lengkap</label>
+                <input id="tambah-nama" type="text" maxlength="60" autocomplete="off" aria-describedby="tambah-nama-galat">
+                <p class="pesan-salah" id="tambah-nama-galat" hidden></p>
+              </div>
+              <div class="kolom">
+                <label for="tambah-jabatan">Jabatan</label>
+                <input id="tambah-jabatan" type="text" maxlength="40" list="daftar-jabatan" autocomplete="off" aria-describedby="tambah-jabatan-galat">
+                <datalist id="daftar-jabatan">
+                  <option value="Ketua RT"></option>
+                  <option value="Bendahara"></option>
+                  <option value="Sekretaris"></option>
+                  <option value="Ketua Karang Taruna"></option>
+                </datalist>
+                <p class="pesan-salah" id="tambah-jabatan-galat" hidden></p>
+              </div>
+              <div class="kolom">
+                <label for="tambah-username">Username</label>
+                <input id="tambah-username" type="text" maxlength="30" autocapitalize="none" spellcheck="false" autocomplete="off" aria-describedby="tambah-username-bantuan tambah-username-galat">
+                <p class="bantuan" id="tambah-username-bantuan">3 sampai 30 karakter: huruf kecil, angka, titik, atau garis bawah. Contoh: ketua.rt</p>
+                <p class="pesan-salah" id="tambah-username-galat" hidden></p>
+              </div>
+              <button type="submit" class="tombol">Tambah pengurus</button>
+            </form>
+          </details>
+        </section>
+
+        <section class="bagian" aria-labelledby="judul-pin">
+          <h2 id="judul-pin" class="judul-bagian">PIN petugas ronda</h2>
+          <form id="form-pin" class="kartu-form" novalidate>
+            <div id="pesan-pin"></div>
+            <p class="bantuan">PIN dipakai bersama oleh petugas ronda untuk mencatat jimpitan. Setelah diganti, petugas yang sedang masuk akan keluar otomatis.</p>
+            <div class="baris-kolom">
+              <div class="kolom">
+                <label for="pin-baru">PIN baru (6 angka)</label>
+                <input id="pin-baru" type="password" inputmode="numeric" maxlength="6" autocomplete="one-time-code" aria-describedby="pin-baru-galat">
+                <p class="pesan-salah" id="pin-baru-galat" hidden></p>
+              </div>
+              <div class="kolom">
+                <label for="pin-ulang">Ulangi PIN baru</label>
+                <input id="pin-ulang" type="password" inputmode="numeric" maxlength="6" autocomplete="one-time-code" aria-describedby="pin-ulang-galat">
+                <p class="pesan-salah" id="pin-ulang-galat" hidden></p>
+              </div>
+            </div>
+            <button type="submit" class="tombol">Simpan PIN</button>
+          </form>
+        </section>
+
+        <section class="bagian" aria-labelledby="judul-password">
+          <h2 id="judul-password" class="judul-bagian">Ganti password saya</h2>
+          <div id="wadah-ganti-password"></div>
+        </section>
+      </section>
+
+      <section id="log" data-bagian aria-labelledby="judul-log" hidden>
+        <div class="judul-halaman">
+          <h1 id="judul-log" tabindex="-1">Log aktivitas</h1>
+          <p class="judul-keterangan">Catatan siapa melakukan apa dan kapan. Hanya pengurus yang bisa melihat halaman ini.</p>
+        </div>
+        <div id="log-hasil" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="dialog" class="dialog"></dialog>
+
+  <footer class="kaki">
+    <div class="wadah">
+      <p>Buku kas RT 05 RW 02 Donglo Santren, Kedung Sugo.</p>
+      <p class="kaki-tautan"><a href="ronda.html">Petugas ronda: catat jimpitan</a></p>
+    </div>
+  </footer>
+</body>
+</html>

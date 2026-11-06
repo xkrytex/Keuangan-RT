@@ -1,0 +1,101 @@
+/* Sumber nilai: DESIGN.md bagian 3-5. Ubah di sini dan di DESIGN.md bersamaan. */
+:root {
+  /* Primitif */
+  --hijau-900: #17472A;
+  --hijau-800: #1F5C36;
+  --hijau-700: #24703F;
+  --hijau-100: #E3EFE3;
+  --hijau-50:  #F4F8F3;
+  --netral-0:   #FFFFFF;
+  --netral-300: #D5E0D5;
+  --netral-500: #7C8A80;
+  --netral-600: #556158;
+  --netral-900: #17201A;
+  --bata-700:   #A6392E;
+
+  /* Gelap: abu-abu netral yang makin terang untuk lapisan lebih tinggi, hijau hanya sebagai aksen. */
+  --malam-950: #0E1011;
+  --malam-900: #171A1C;
+  --malam-800: #1C2B22;
+  --malam-700: #2E3336;
+  --malam-500: #70777D;
+  --malam-300: #A8AEB3;
+  --malam-100: #ECEEEF;
+  --daun-300:  #72C493;
+  --daun-200:  #9FDDB5;
+  --daun-400:  #6CCB8F;
+  --hutan-900: #173D27;
+  --hutan-100: #B9DCC6;
+  --bata-300:  #F2948A;
+
+  --jarak-1: 4px;  --jarak-2: 8px;  --jarak-3: 12px; --jarak-4: 16px;
+  --jarak-6: 24px; --jarak-8: 32px; --jarak-12: 48px;
+
+  --huruf: "Plus Jakarta Sans", system-ui, sans-serif;
+  --ukuran-kecil: 0.875rem;
+  --ukuran-dasar: 1rem;
+  --ukuran-sedang: 1.125rem;
+  --ukuran-judul: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+  --ukuran-saldo: clamp(1.75rem, 1.4rem + 2vw, 2.5rem);
+
+  --sudut-kecil: 6px;
+  --sudut-sedang: 10px;
+
+  /* Semantik: tema terang (bawaan) */
+  color-scheme: light;
+  --warna-latar: var(--hijau-50);
+  --warna-permukaan: var(--netral-0);
+  --warna-teks: var(--netral-900);
+  --warna-teks-sekunder: var(--netral-600);
+  --warna-garis: var(--netral-300);
+  --warna-batas-input: var(--netral-500);
+  --warna-utama: var(--hijau-800);
+  --warna-utama-tekan: var(--hijau-900);
+  --warna-utama-lembut: var(--hijau-100);
+  --warna-di-utama: var(--netral-0);
+  --warna-fokus: var(--hijau-800);
+  --warna-masuk: var(--hijau-700);
+  --warna-keluar: var(--bata-700);
+  --warna-bahaya: var(--bata-700);
+  --warna-batal: var(--netral-600);
+  --warna-sorot: var(--hijau-800);
+  --warna-di-sorot: var(--netral-0);
+  --warna-di-sorot-sekunder: var(--hijau-100);
+
+  /* Komponen */
+  --tombol-tinggi: 48px;
+  --tombol-latar: var(--warna-utama);
+  --tombol-latar-tekan: var(--warna-utama-tekan);
+  --tombol-teks: var(--warna-di-utama);
+  --tombol-sudut: var(--sudut-kecil);
+  --input-tinggi: 48px;
+  --input-batas: var(--warna-batas-input);
+  --input-sudut: var(--sudut-kecil);
+  --kartu-latar: var(--warna-permukaan);
+  --kartu-sudut: var(--sudut-sedang);
+  --kartu-jarak-dalam: var(--jarak-4);
+  --baris-jarak-tegak: var(--jarak-3);
+}
+
+/* Semantik: tema gelap (pilihan, disimpan di perangkat) */
+:root[data-tema="gelap"] {
+  color-scheme: dark;
+  --warna-latar: var(--malam-950);
+  --warna-permukaan: var(--malam-900);
+  --warna-teks: var(--malam-100);
+  --warna-teks-sekunder: var(--malam-300);
+  --warna-garis: var(--malam-700);
+  --warna-batas-input: var(--malam-500);
+  --warna-utama: var(--daun-300);
+  --warna-utama-tekan: var(--daun-200);
+  --warna-utama-lembut: var(--malam-800);
+  --warna-di-utama: var(--malam-950);
+  --warna-fokus: var(--daun-200);
+  --warna-masuk: var(--daun-400);
+  --warna-keluar: var(--bata-300);
+  --warna-bahaya: var(--bata-300);
+  --warna-batal: var(--malam-300);
+  --warna-sorot: var(--hutan-900);
+  --warna-di-sorot: var(--netral-0);
+  --warna-di-sorot-sekunder: var(--hutan-100);
+}

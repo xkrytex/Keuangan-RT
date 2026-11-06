@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar Transaksi · RT 05 RW 02 Donglo Santren</title>
+  <meta name="description" content="Semua pemasukan, pengeluaran, dan pindah kas RT 05 RW 02 Donglo Santren, Kedung Sugo.">
+  <meta name="theme-color" content="#1F5C36">
+  <script>try { if (localStorage.getItem('tema') === 'gelap') document.documentElement.dataset.tema = 'gelap'; } catch (e) {}</script>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/tema.js"></script>
+  <script type="module" src="js/sesi.js"></script>
+  <script type="module" src="js/transaksi.js"></script>
+</head>
+<body>
+  <a class="lewati" href="#isi">Langsung ke isi</a>
+  <header class="kepala">
+    <div class="wadah kepala-isi">
+      <a class="merek" href="./">
+        <span class="merek-logo" aria-hidden="true"></span>
+        <span class="merek-teks"><strong>Kas RT 05 RW 02</strong><span>Donglo Santren, Kedung Sugo</span></span>
+      </a>
+      <div class="kepala-aksi">
+        <button type="button" class="tombol-ikon tombol-keluar" id="tombol-keluar" hidden title="Keluar dari akun pengurus">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#keluar"></use></svg>
+          <span class="label-keluar">Keluar</span>
+        </button>
+        <button type="button" class="tombol-ikon tombol-tema" id="tombol-tema" aria-pressed="false" title="Mode gelap">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#bulan"></use></svg>
+          <span class="sr-only">Mode gelap</span>
+        </button>
+      </div>
+      <nav class="menu" aria-label="Menu utama">
+        <a href="./">Beranda</a>
+        <a href="transaksi.html" aria-current="page">Transaksi</a>
+        <a href="laporan.html">Laporan</a>
+        <a href="admin.html">Pengurus</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="isi" class="wadah">
+    <div class="judul-halaman">
+      <h1>Daftar transaksi</h1>
+      <p class="judul-keterangan">Transaksi yang dibatalkan tetap ditampilkan, dicoret, beserta alasannya.</p>
+    </div>
+
+    <form id="filter" class="filter" aria-label="Saring transaksi">
+      <div class="kolom">
+        <label for="filter-kas">Kas</label>
+        <select id="filter-kas" name="kas"><option value="">Semua kas</option></select>
+      </div>
+      <div class="kolom">
+        <label for="filter-bulan">Bulan</label>
+        <select id="filter-bulan" name="bulan"><option value="">Semua bulan</option></select>
+      </div>
+      <div class="kolom">
+        <label for="filter-jenis">Jenis</label>
+        <select id="filter-jenis" name="jenis"><option value="">Semua jenis</option></select>
+      </div>
+      <button type="reset" class="tombol tombol-sekunder">Hapus filter</button>
+    </form>
+
+    <section class="bagian" aria-labelledby="judul-hasil">
+      <h2 id="judul-hasil" class="judul-bagian" tabindex="-1">Hasil</h2>
+      <p id="ringkas-hasil" class="ringkas-hasil" aria-live="polite"></p>
+      <div id="hasil" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <dialog id="dialog" class="dialog"></dialog>
+
+  <footer class="kaki">
+    <div class="wadah">
+      <p>Buku kas RT 05 RW 02 Donglo Santren, Kedung Sugo.</p>
+      <p class="kaki-tautan"><a href="ronda.html">Petugas ronda: catat jimpitan</a></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laporan Keuangan · RT 05 RW 02 Donglo Santren</title>
+  <meta name="description" content="Laporan keuangan bulanan dan tahunan Kas Lampu, Kas RT, dan Kas Jimpitan RT 05 RW 02 Donglo Santren, Kedung Sugo.">
+  <meta name="theme-color" content="#1F5C36">
+  <script>try { if (localStorage.getItem('tema') === 'gelap') document.documentElement.dataset.tema = 'gelap'; } catch (e) {}</script>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+  <script type="module" src="js/tema.js"></script>
+  <script type="module" src="js/sesi.js"></script>
+  <script type="module" src="js/laporan.js"></script>
+</head>
+<body>
+  <a class="lewati" href="#isi">Langsung ke isi</a>
+  <header class="kepala">
+    <div class="wadah kepala-isi">
+      <a class="merek" href="./">
+        <span class="merek-logo" aria-hidden="true"></span>
+        <span class="merek-teks"><strong>Kas RT 05 RW 02</strong><span>Donglo Santren, Kedung Sugo</span></span>
+      </a>
+      <div class="kepala-aksi">
+        <button type="button" class="tombol-ikon tombol-keluar" id="tombol-keluar" hidden title="Keluar dari akun pengurus">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#keluar"></use></svg>
+          <span class="label-keluar">Keluar</span>
+        </button>
+        <button type="button" class="tombol-ikon tombol-tema" id="tombol-tema" aria-pressed="false" title="Mode gelap">
+          <svg class="ikon" aria-hidden="true" focusable="false"><use href="img/ikon.svg#bulan"></use></svg>
+          <span class="sr-only">Mode gelap</span>
+        </button>
+      </div>
+      <nav class="menu" aria-label="Menu utama">
+        <a href="./">Beranda</a>
+        <a href="transaksi.html">Transaksi</a>
+        <a href="laporan.html" aria-current="page">Laporan</a>
+        <a href="admin.html">Pengurus</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="isi" class="wadah">
+    <div class="judul-halaman layar-saja">
+      <h1>Laporan keuangan</h1>
+      <p class="judul-keterangan">Pilih bulan atau tahun, lalu cetak atau simpan sebagai PDF untuk ditempel di pos ronda atau dibagikan di grup warga.</p>
+    </div>
+
+    <form id="pilih-laporan" class="filter filter-laporan layar-saja" aria-label="Pilih laporan">
+      <fieldset class="pilihan-jenis pilihan-laporan">
+        <legend>Jenis laporan</legend>
+        <label><input type="radio" name="jenis" value="bulanan" checked> Bulanan</label>
+        <label><input type="radio" name="jenis" value="tahunan"> Tahunan</label>
+      </fieldset>
+      <div class="kolom" id="kolom-bulan">
+        <label for="laporan-bulan">Bulan</label>
+        <select id="laporan-bulan"></select>
+      </div>
+      <div class="kolom" id="kolom-tahun" hidden>
+        <label for="laporan-tahun">Tahun</label>
+        <select id="laporan-tahun"></select>
+      </div>
+    </form>
+
+    <div class="bilah-laporan layar-saja">
+      <button type="button" class="tombol" id="tombol-cetak" disabled>Cetak atau simpan PDF</button>
+      <a class="tombol tombol-sekunder" id="tautan-sheet" target="_blank" rel="noopener" hidden>Buka di Google Sheets</a>
+    </div>
+
+    <article id="laporan" class="laporan" aria-live="polite"></article>
+  </main>
+
+  <footer class="kaki">
+    <div class="wadah">
+      <p>Buku kas RT 05 RW 02 Donglo Santren, Kedung Sugo.</p>
+      <p class="kaki-tautan"><a href="ronda.html">Petugas ronda: catat jimpitan</a></p>
+    </div>
+  </footer>
+</body>
+</html>
