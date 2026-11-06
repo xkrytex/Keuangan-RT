@@ -141,7 +141,7 @@ formSheet.addEventListener('submit', async (e) => {
 
 export function siapkanBuku() {
   const sekarang = periodeIni();
-  for (let i = 1; i <= 24; i++) {
+  for (let i = 0; i <= 24; i++) {
     const p = geserPeriode(sekarang, -i);
     pilihBulan.append(el('option', { value: p, text: namaBulan(p) }));
   }

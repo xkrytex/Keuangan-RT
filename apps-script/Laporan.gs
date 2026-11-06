@@ -217,86 +217,372 @@ function tulisLaporanAman(periode) {
   }
 }
 
-function tabBersih(ss, nama) {
-  const ada = ss.getSheetByName(nama);
-  if (ada) {
-    ada.clear();
-    return ada;
+// ---- Spreadsheet LAPORAN ----
+// Tata letaknya dibuat untuk dicetak di A4 (bulanan potret, rekap lanskap) sebagai bahan rapat.
+// Warna diambil dari palet web dan tetap terbaca kalau dicetak hitam-putih.
+const WARNA_LAPORAN = {
+  tua: '#17472A', utama: '#1F5C36', muda: '#E3EFE3', lembut: '#F4F8F3',
+  garis: '#B7C7BA', sekunder: '#556158', demo: '#FCE8E6', teksDemo: '#A6392E',
+};
+// Nol ditulis "-" agar kolom kosong tidak terbaca sebagai angka yang terlewat.
+const FORMAT_RUPIAH = '"Rp "#,##0;"-Rp "#,##0;"-"';
+const TINGGI_BARIS = 24;
+const TEKS_DEMO = 'DATA CONTOH UNTUK DEMO. Angka di laporan ini bukan keuangan RT yang sebenarnya.';
+
+function bukaLaporan() {
+  return SpreadsheetApp.openById(prop('ID_LAPORAN'));
+}
+
+// Urutan tab: Petunjuk, lalu per tahun terbaru: rekap tahunnya, kemudian bulan dari yang terbaru.
+function kunciUrutTab(nama) {
+  if (nama === 'Petunjuk') return '0';
+  const m = /^(Rekap|Laporan)-(\d{4})(?:-(\d{2}))?$/.exec(nama);
+  if (!m) return '9' + nama;
+  return '1' + (9999 - Number(m[2])) + (m[1] === 'Rekap' ? '00' : String(99 - Number(m[3])).padStart(2, '0'));
+}
+
+// Tab lama dikosongkan di tempat, bukan dihapus, agar tautan ke tab itu (gid) tetap berlaku.
+function siapkanTab(ss, nama, lebar) {
+  let sheet = ss.getSheetByName(nama);
+  if (sheet) {
+    sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).breakApart();
+    sheet.clear();
+    sheet.setRowHeights(1, sheet.getMaxRows(), TINGGI_BARIS);
+  } else {
+    const kunci = kunciUrutTab(nama);
+    const posisi = ss.getSheets().filter(function (s) { return kunciUrutTab(s.getName()) < kunci; }).length;
+    sheet = ss.insertSheet(nama, posisi);
   }
-  return ss.insertSheet(nama);
+  if (sheet.getMaxColumns() > lebar) sheet.deleteColumns(lebar + 1, sheet.getMaxColumns() - lebar);
+  sheet.setHiddenGridlines(true);
+  sheet.setFrozenRows(0);
+  return sheet;
+}
+
+function formatWaktu(iso) {
+  return formatTanggal(iso.slice(0, 10)) + ' pukul ' + iso.slice(11, 16).replace(':', '.');
+}
+
+// Menyusun isi tab baris demi baris sambil mencatat gaya tiap baris, lalu menulis semuanya sekaligus.
+// Satu panggilan setValues jauh lebih cepat daripada menulis per sel di Apps Script.
+function susunanLembar(lebar) {
+  const baris = [];
+  const gaya = [];
+  return {
+    lebar: lebar,
+    baris: baris,
+    tambah: function (isi, jenis, opsi) {
+      const lengkap = isi.slice();
+      while (lengkap.length < lebar) lengkap.push('');
+      baris.push(lengkap);
+      gaya.push({ n: baris.length, jenis: jenis || '', opsi: opsi || {} });
+      return baris.length;
+    },
+    gaya: gaya,
+  };
+}
+
+function tulisKop(s, judul, keterangan) {
+  s.tambah([judul], 'judul');
+  s.tambah(['RT 05 RW 02 Donglo Santren, Kedung Sugo'], 'subjudul');
+  s.tambah([keterangan], 'keterangan');
+  if (prop('MODE_DEMO') === '1') s.tambah([TEKS_DEMO], 'demo');
+  s.tambah([''], 'jarak');
+}
+
+// Kolom ttd: [kolom awal, jumlah kolom] untuk Ketua RT dan Bendahara.
+function tulisTandaTangan(s, kiri, kanan) {
+  s.tambah([''], 'jarak');
+  const tempat = [];
+  tempat[kanan[0] - 1] = 'Donglo Santren, ' + formatTanggal(hariIni());
+  s.tambah(tempat, 'ttd', { kiri: kiri, kanan: kanan });
+  const jabatan = [];
+  jabatan[kiri[0] - 1] = 'Ketua RT';
+  jabatan[kanan[0] - 1] = 'Bendahara';
+  s.tambah(jabatan, 'ttd', { kiri: kiri, kanan: kanan });
+  s.tambah([''], 'ruang-ttd');
+  const nama = [];
+  nama[kiri[0] - 1] = '(................................)';
+  nama[kanan[0] - 1] = '(................................)';
+  s.tambah(nama, 'ttd', { kiri: kiri, kanan: kanan });
+  s.tambah([''], 'jarak');
+  s.tambah(['Dibuat otomatis oleh web kas RT pada ' + formatWaktu(waktuIso()) + '.'], 'catatan-kaki');
+}
+
+function terapkanGaya(sheet, s) {
+  const L = s.lebar;
+  const W = WARNA_LAPORAN;
+  sheet.getRange(1, 1, s.baris.length, L).setValues(s.baris)
+    .setFontFamily('Arial').setFontSize(10).setVerticalAlignment('middle').setFontColor('#17201A');
+  sheet.setRowHeights(1, s.baris.length, TINGGI_BARIS);
+  const baris = function (n, dari, jumlah) { return sheet.getRange(n, dari || 1, 1, jumlah || L - (dari || 1) + 1); };
+  const garisTipis = SpreadsheetApp.BorderStyle.SOLID;
+
+  s.gaya.forEach(function (g) {
+    const o = g.opsi;
+    switch (g.jenis) {
+      case 'judul':
+        baris(g.n).merge().setFontSize(15).setFontWeight('bold').setFontColor(W.tua).setHorizontalAlignment('center');
+        sheet.setRowHeight(g.n, 32);
+        break;
+      case 'subjudul':
+        baris(g.n).merge().setFontSize(11).setFontWeight('bold').setHorizontalAlignment('center');
+        break;
+      case 'keterangan':
+        baris(g.n).merge().setFontColor(W.sekunder).setHorizontalAlignment('center')
+          .setBorder(null, null, true, null, null, null, W.tua, SpreadsheetApp.BorderStyle.SOLID_THICK);
+        sheet.setRowHeight(g.n, 28);
+        break;
+      case 'demo':
+        baris(g.n).merge().setBackground(W.demo).setFontColor(W.teksDemo).setFontWeight('bold')
+          .setHorizontalAlignment('center').setWrap(true);
+        sheet.setRowHeight(g.n, 30);
+        break;
+      case 'bagian':
+        baris(g.n).merge().setBackground(W.utama).setFontColor('#FFFFFF').setFontWeight('bold').setFontSize(11);
+        sheet.setRowHeight(g.n, 28);
+        break;
+      case 'kepala-tabel':
+        baris(g.n).setBackground(W.muda).setFontWeight('bold').setFontColor(W.tua)
+          .setBorder(true, true, true, true, true, true, W.garis, garisTipis);
+        if (o.kanan) sheet.getRange(g.n, o.kanan, 1, L - o.kanan + 1).setHorizontalAlignment('right');
+        break;
+      case 'kepala-grup':
+        baris(g.n).setBackground(W.muda).setFontWeight('bold').setFontColor(W.tua).setHorizontalAlignment('center')
+          .setBorder(true, true, true, true, true, true, W.garis, garisTipis);
+        o.gabung.forEach(function (r) { sheet.getRange(g.n, r[0], 1, r[1]).merge(); });
+        break;
+      case 'isi':
+        baris(g.n).setBorder(true, true, true, true, true, true, W.garis, garisTipis);
+        if (o.gabung) sheet.getRange(g.n, o.gabung[0], 1, o.gabung[1]).merge();
+        if (o.lembut) baris(g.n).setBackground(W.lembut);
+        if (o.miring) baris(g.n, 2).setFontStyle('italic').setFontColor(W.sekunder);
+        if (o.tebal) baris(g.n).setFontWeight('bold');
+        break;
+      case 'jumlah':
+        baris(g.n).setFontWeight('bold').setBackground(W.lembut)
+          .setBorder(true, true, true, true, true, true, W.garis, garisTipis)
+          .setBorder(true, null, null, null, null, null, W.tua, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+        if (o.gabung) sheet.getRange(g.n, o.gabung[0], 1, o.gabung[1]).merge();
+        break;
+      case 'akhir':
+        baris(g.n).setFontWeight('bold').setBackground(W.muda).setFontColor(W.tua)
+          .setBorder(true, true, true, true, true, true, W.garis, garisTipis);
+        if (o.gabung) sheet.getRange(g.n, o.gabung[0], 1, o.gabung[1]).merge();
+        break;
+      case 'ttd':
+        sheet.getRange(g.n, o.kiri[0], 1, o.kiri[1]).merge().setHorizontalAlignment('center');
+        sheet.getRange(g.n, o.kanan[0], 1, o.kanan[1]).merge().setHorizontalAlignment('center');
+        break;
+      case 'ruang-ttd':
+        sheet.setRowHeight(g.n, 64);
+        break;
+      case 'catatan-kaki':
+        baris(g.n).merge().setFontSize(8).setFontColor(W.sekunder).setFontStyle('italic');
+        break;
+      case 'jarak':
+        sheet.setRowHeight(g.n, 12);
+        break;
+    }
+  });
+}
+
+// Tinggi baris yang diatur manual tidak ikut membesar saat teks terbungkus, jadi teks panjang diberi tinggi
+// sesuai perkiraan jumlah barisnya (lebar kolom dibagi lebar rata-rata huruf Arial 10).
+function sesuaikanTinggi(sheet, s, kolom, hurufPerBaris) {
+  s.gaya.forEach(function (g) {
+    if (g.jenis !== 'isi' || g.opsi.gabung) return;
+    const jumlahBaris = Math.ceil(String(s.baris[g.n - 1][kolom - 1]).length / hurufPerBaris);
+    if (jumlahBaris > 1) sheet.setRowHeight(g.n, 8 + jumlahBaris * 16);
+  });
 }
 
 function tulisLaporanBulanan(periode) {
-  const ss = SpreadsheetApp.openById(prop('ID_LAPORAN'));
+  const ss = bukaLaporan();
   const semua = bacaTab(TAB.TRANSAKSI);
   const ringkas = ringkasBulan(semua, periode);
   const status = statusPeriode(periode);
-  const sheet = tabBersih(ss, 'Laporan-' + periode);
+  const teksStatus = { TUTUP: 'Buku sudah ditutup', DIBUKA: 'Buku dibuka kembali untuk koreksi', TERBUKA: 'Buku belum ditutup' };
+  const akhirBulan = geserTanggal(geserPeriode(periode, 1) + '-01', -1);
 
-  const baris = [
-    ['LAPORAN KEUANGAN RT 05 RW 02', '', '', '', ''],
-    ['Donglo Santren, Kedung Sugo', '', '', '', ''],
-    ['Periode: ' + namaPeriode(periode) + (status === 'TUTUP' ? ' (buku sudah ditutup)' : ' (buku belum ditutup)'), '', '', '', ''],
-    ['', '', '', '', ''],
-  ];
-  const barisJudul = [];
+  // Kolom: A Tanggal, B Keterangan, C Kategori, D Masuk, E Keluar.
+  const s = susunanLembar(5);
+  tulisKop(s, 'LAPORAN KEUANGAN BULANAN', 'Periode ' + namaPeriode(periode) + '  ·  ' + teksStatus[status]);
+
+  s.tambah(['Ringkasan'], 'bagian');
+  s.tambah(['Kas', 'Saldo awal', 'Pemasukan', 'Pengeluaran', 'Saldo akhir'], 'kepala-tabel', { kanan: 2 });
+  const total = { saldo_awal: 0, total_masuk: 0, total_keluar: 0, saldo_akhir: 0 };
   KAS.forEach(function (kas) {
     const r = ringkas[kas];
-    barisJudul.push(baris.length + 1);
-    baris.push([NAMA_KAS[kas], '', '', '', '']);
-    baris.push(['Tanggal', 'Keterangan', 'Kategori', 'Masuk', 'Keluar']);
-    baris.push(['', 'Saldo awal', '', r.saldo_awal, '']);
+    s.tambah([NAMA_KAS[kas], r.saldo_awal, r.total_masuk, r.total_keluar, r.saldo_akhir], 'isi');
+    Object.keys(total).forEach(function (k) { total[k] += r[k]; });
+  });
+  s.tambah(['Jumlah ketiga kas', total.saldo_awal, total.total_masuk, total.total_keluar, total.saldo_akhir], 'jumlah');
+  s.tambah([''], 'jarak');
+
+  KAS.forEach(function (kas) {
+    const r = ringkas[kas];
+    s.tambah([NAMA_KAS[kas]], 'bagian');
+    s.tambah(['Tanggal', 'Keterangan', 'Kategori', 'Masuk', 'Keluar'], 'kepala-tabel', { kanan: 4 });
+    s.tambah(['', 'Saldo awal ' + formatTanggal(periode + '-01'), '', r.saldo_awal], 'isi', { tebal: true, lembut: true, gabung: [4, 2] });
     // Nominalnya sudah ada di baris Saldo awal, jadi di sini hanya keterangan agar tidak terhitung dua kali.
     r.saldo_awal_dicatat.forEach(function (t) {
-      baris.push([formatTanggal(t.tanggal), selAman('Termasuk saldo awal: ' + t.uraian + ' (' + formatRupiah(t.nominal) + ')'),
-        KATEGORI_SALDO_AWAL, '', '']);
+      s.tambah([formatTanggal(t.tanggal), selAman('Sudah termasuk saldo awal: ' + t.uraian + ' (' + formatRupiah(t.nominal) + ')')],
+        'isi', { miring: true, gabung: [2, 4] });
     });
     r.transaksi.forEach(function (t) {
       const uraian = t.kas_lawan ? t.uraian + ' (' + (t.masuk ? 'dari ' : 'ke ') + NAMA_KAS[t.kas_lawan] + ')' : t.uraian;
-      baris.push([formatTanggal(t.tanggal), selAman(uraian), selAman(t.kategori), t.masuk || '', t.keluar || '']);
+      s.tambah([formatTanggal(t.tanggal), selAman(uraian), selAman(t.kategori), t.masuk || '', t.keluar || ''], 'isi');
     });
-    baris.push(['', 'Jumlah', '', r.total_masuk, r.total_keluar]);
-    baris.push(['', 'Saldo akhir', '', r.saldo_akhir, '']);
-    baris.push(['', '', '', '', '']);
+    if (!r.transaksi.length) s.tambah(['', 'Tidak ada pemasukan atau pengeluaran bulan ini.'], 'isi', { miring: true, gabung: [2, 4] });
+    s.tambah(['', 'Jumlah', '', r.total_masuk, r.total_keluar], 'jumlah');
+    s.tambah(['', 'Saldo akhir ' + formatTanggal(akhirBulan), '', r.saldo_akhir], 'akhir', { gabung: [4, 2] });
+    s.tambah([''], 'jarak');
   });
-  baris.push(['Dibuat otomatis: ' + formatTanggal(hariIni()), '', '', '', '']);
+  tulisTandaTangan(s, [2, 1], [4, 2]);
 
-  sheet.getRange(1, 1, baris.length, 5).setValues(baris);
-  sheet.getRange(1, 1, 3, 1).setFontWeight('bold');
-  barisJudul.forEach(function (n) {
-    sheet.getRange(n, 1, 1, 5).setFontWeight('bold');
-    sheet.getRange(n + 1, 1, 1, 5).setFontWeight('bold').setBackground('#E3EFE3');
-  });
-  sheet.getRange(1, 4, baris.length, 2).setNumberFormat('#,##0');
-  sheet.setColumnWidths(1, 1, 110);
-  sheet.setColumnWidth(2, 320);
-  sheet.setColumnWidth(3, 150);
-  sheet.setColumnWidths(4, 2, 120);
+  const sheet = siapkanTab(ss, 'Laporan-' + periode, 5);
+  terapkanGaya(sheet, s);
+  sheet.getRange(1, 2, s.baris.length, 4).setNumberFormat(FORMAT_RUPIAH);
+  sheet.getRange(1, 2, s.baris.length, 1).setWrap(true);
+  sheet.setColumnWidth(1, 120);
+  sheet.setColumnWidth(2, 300);
+  sheet.setColumnWidth(3, 130);
+  sheet.setColumnWidths(4, 2, 110);
+  sesuaikanTinggi(sheet, s, 2, 46);
+  sheet.setTabColor(WARNA_LAPORAN.muda);
 
   tulisRekapTahun(ss, semua, periode.slice(0, 4));
+  tulisPetunjuk(ss);
 }
 
 function tulisRekapTahun(ss, semua, tahun) {
   const rekap = rekapTahun(semua, tahun);
-  const sheet = tabBersih(ss, 'Rekap-' + tahun);
-  const judul = ['Bulan'];
+  const sekarang = periodeDari(hariIni());
+  const awalTahun = hitungSaldo(semua, (Number(tahun) - 1) + '-12-31');
+  // Saldo awal kas yang dicatat di tahun ini (awal pembukuan) ikut dihitung sebagai saldo awal, sama seperti laporan bulanan.
+  hanyaAktif(semua).forEach(function (t) {
+    if (adalahSaldoAwal(t) && t.tanggal.slice(0, 4) === tahun) awalTahun[t.kas] += t.nominal;
+  });
+
+  // Kolom: A Bulan, lalu per kas: Masuk, Keluar, Saldo akhir.
+  const L = 1 + KAS.length * 3;
+  const s = susunanLembar(L);
+  tulisKop(s, 'REKAP KEUANGAN TAHUN ' + tahun, 'Januari sampai Desember ' + tahun + '  ·  Pemasukan, pengeluaran, dan saldo akhir per bulan');
+
+  const grup = ['Bulan'];
+  const sub = [''];
   KAS.forEach(function (kas) {
-    judul.push(NAMA_KAS[kas] + ' masuk', NAMA_KAS[kas] + ' keluar', NAMA_KAS[kas] + ' saldo akhir');
+    grup.push(NAMA_KAS[kas], '', '');
+    sub.push('Masuk', 'Keluar', 'Saldo akhir');
   });
-  const baris = [['REKAP KEUANGAN RT 05 RW 02 TAHUN ' + tahun].concat(judul.slice(1).map(function () { return ''; })), judul];
+  const n1 = s.tambah(grup, 'kepala-grup', { gabung: KAS.map(function (k, i) { return [2 + i * 3, 3]; }) });
+  s.tambah(sub, 'kepala-grup', { gabung: [] });
+
+  const awal = ['Saldo awal'];
+  KAS.forEach(function (kas) { awal.push('', '', awalTahun[kas]); });
+  s.tambah(awal, 'isi', { tebal: true, lembut: true });
+
+  const jumlah = ['Jumlah'];
+  const masuk = {};
+  const keluar = {};
+  let terakhir = null;
+  KAS.forEach(function (kas) { masuk[kas] = 0; keluar[kas] = 0; });
   rekap.bulan.forEach(function (b) {
-    const isi = [namaPeriode(b.periode)];
-    KAS.forEach(function (kas) { isi.push(b.kas[kas].masuk, b.kas[kas].keluar, b.kas[kas].saldo_akhir); });
-    baris.push(isi);
+    // Bulan yang belum datang dikosongkan agar saldonya tidak terbaca sebagai angka pasti.
+    if (b.periode > sekarang) {
+      s.tambah([BULAN[Number(b.periode.slice(5, 7)) - 1]], 'isi', { miring: true });
+      return;
+    }
+    const isi = [BULAN[Number(b.periode.slice(5, 7)) - 1]];
+    KAS.forEach(function (kas) {
+      isi.push(b.kas[kas].masuk, b.kas[kas].keluar, b.kas[kas].saldo_akhir);
+      masuk[kas] += b.kas[kas].masuk;
+      keluar[kas] += b.kas[kas].keluar;
+    });
+    terakhir = b;
+    s.tambah(isi, 'isi');
   });
-  sheet.getRange(1, 1, baris.length, judul.length).setValues(baris);
-  sheet.getRange(1, 1, 2, judul.length).setFontWeight('bold');
-  sheet.getRange(3, 2, 12, judul.length - 1).setNumberFormat('#,##0');
-  sheet.setFrozenRows(2);
+  KAS.forEach(function (kas) { jumlah.push(masuk[kas], keluar[kas], terakhir ? terakhir.kas[kas].saldo_akhir : awalTahun[kas]); });
+  s.tambah(jumlah, 'jumlah');
+  tulisTandaTangan(s, [2, 3], [L - 2, 3]);
+
+  const sheet = siapkanTab(ss, 'Rekap-' + tahun, L);
+  terapkanGaya(sheet, s);
+  // Kolom Bulan pada dua baris judul digabung ke bawah.
+  sheet.getRange(n1, 1, 2, 1).merge().setVerticalAlignment('middle');
+  // Saldo awal, 12 bulan, dan Jumlah.
+  sheet.getRange(n1 + 2, 2, 14, L - 1).setNumberFormat(FORMAT_RUPIAH).setHorizontalAlignment('right');
+  sheet.setColumnWidth(1, 110);
+  sheet.setColumnWidths(2, L - 1, 96);
+  sheet.setTabColor(WARNA_LAPORAN.utama);
 }
 
+// Daftar isi spreadsheet: setiap laporan punya tautan ke tabnya dan tautan PDF A4 yang siap dicetak.
+function tulisPetunjuk(ss) {
+  const ditutup = {};
+  barisTutupBuku().forEach(function (b) { ditutup[b.periode] = b.status; });
+  const daftar = ss.getSheets().filter(function (sh) { return sh.getName() !== 'Petunjuk' && kunciUrutTab(sh.getName()).charAt(0) === '1'; })
+    .sort(function (a, b) { return kunciUrutTab(a.getName()) < kunciUrutTab(b.getName()) ? -1 : 1; });
+
+  const s = susunanLembar(4);
+  s.tambah(['LAPORAN KEUANGAN RT 05 RW 02'], 'judul');
+  s.tambah(['Donglo Santren, Kedung Sugo'], 'subjudul');
+  s.tambah(['Diisi otomatis oleh web kas RT. Spreadsheet ini hanya bisa dilihat.'], 'keterangan');
+  if (prop('MODE_DEMO') === '1') s.tambah([TEKS_DEMO], 'demo');
+  s.tambah([''], 'jarak');
+  const nPanduan = s.tambah(['Untuk dicetak sebagai bahan rapat, klik "Unduh PDF". PDF sudah diatur ke kertas A4: laporan bulanan tegak, rekap tahunan mendatar.'],
+    'isi', { gabung: [1, 4], miring: true });
+  s.tambah([''], 'jarak');
+  s.tambah(['Laporan', 'Status', 'Tab', 'PDF'], 'kepala-tabel');
+  const mulai = s.baris.length + 1;
+  daftar.forEach(function (sh) {
+    const nama = sh.getName();
+    const rekap = nama.indexOf('Rekap-') === 0;
+    const periode = nama.replace(/^(Rekap|Laporan)-/, '');
+    const status = rekap ? 'Rekap tahunan' : ({ TUTUP: 'Buku ditutup', DIBUKA: 'Dibuka kembali' })[ditutup[periode]] || 'Bulan berjalan';
+    s.tambah([rekap ? 'Rekap tahun ' + periode : 'Laporan ' + namaPeriode(periode), status, 'Buka tab', 'Unduh PDF'], 'isi', { tebal: rekap });
+  });
+  if (!daftar.length) s.tambah(['Belum ada laporan. Laporan pertama ditulis setelah ada transaksi.'], 'isi', { gabung: [1, 4], miring: true });
+
+  const sheet = siapkanTab(ss, 'Petunjuk', 4);
+  terapkanGaya(sheet, s);
+  daftar.forEach(function (sh, i) {
+    const rekap = sh.getName().indexOf('Rekap-') === 0;
+    sheet.getRange(mulai + i, 3).setRichTextValue(tautanSel('Buka tab', '#gid=' + sh.getSheetId()));
+    sheet.getRange(mulai + i, 4).setRichTextValue(tautanSel('Unduh PDF', urlPdf(ss, sh, !rekap)));
+  });
+  sheet.getRange(1, 1, s.baris.length, 4).setWrap(true);
+  sheet.setColumnWidth(1, 230);
+  sheet.setColumnWidth(2, 150);
+  sheet.setColumnWidths(3, 2, 110);
+  sheet.setRowHeight(nPanduan, 42);
+}
+
+function tautanSel(teks, url) {
+  return SpreadsheetApp.newRichTextValue().setText(teks).setLinkUrl(url).build();
+}
+
+function urlPdf(ss, sheet, tegak) {
+  return 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=pdf&gid=' + sheet.getSheetId() +
+    '&size=A4&portrait=' + tegak + '&fitw=true&gridlines=false&printtitle=false&sheetnames=false' +
+    '&pagenum=CENTER&horizontal_alignment=CENTER&top_margin=0.6&bottom_margin=0.6&left_margin=0.6&right_margin=0.6';
+}
+
+// Pemicu harian: tab bulan berjalan diperbarui setiap pagi, begitu juga bulan lalu selama bukunya belum ditutup
+// (petugas ronda masih boleh mencatat jimpitan kemarin, jadi tanggal 1 pun bulan lalu bisa bertambah).
+function laporanOtomatisHarian() {
+  const sekarang = periodeDari(hariIni());
+  const lalu = geserPeriode(sekarang, -1);
+  const adaTransaksi = {};
+  hanyaAktif(bacaTab(TAB.TRANSAKSI)).forEach(function (t) { adaTransaksi[periodeDari(t.tanggal)] = true; });
+  if (adaTransaksi[lalu] && statusPeriode(lalu) !== 'TUTUP') tulisLaporanAman(lalu);
+  if (adaTransaksi[sekarang]) tulisLaporanAman(sekarang);
+}
+
+// Nama lama pemicu bulanan. Dipertahankan agar pemicu yang sudah terpasang sebelum pembaruan tidak galat.
 function laporanOtomatisBulanan() {
-  tulisLaporanAman(geserPeriode(periodeDari(hariIni()), -1));
+  laporanOtomatisHarian();
 }
 
 function cadanganMingguan() {

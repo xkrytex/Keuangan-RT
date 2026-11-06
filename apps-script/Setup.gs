@@ -37,10 +37,7 @@ function setupAwal() {
 
   const laporan = SpreadsheetApp.create('Laporan Keuangan RT 05 RW 02 (publik)');
   aturZonaDanLokal(laporan);
-  laporan.getSheets()[0].setName('Petunjuk').getRange(1, 1, 2, 1).setValues([
-    ['Laporan keuangan RT 05 RW 02 Donglo Santren, Kedung Sugo.'],
-    ['Tab Laporan-YYYY-MM dan Rekap-YYYY dibuat otomatis oleh sistem. Jangan diedit manual.'],
-  ]);
+  laporan.getSheets()[0].setName('Petunjuk');
 
   DriveApp.getFileById(data.getId()).moveTo(induk);
   const fileLaporan = DriveApp.getFileById(laporan.getId());
@@ -53,6 +50,7 @@ function setupAwal() {
   setProp('ID_FOLDER_NOTA', nota.getId());
   setProp('ID_FOLDER_CADANGAN', cadangan.getId());
   setProp('VERSI_DATA', 1);
+  tulisPetunjuk(laporan);
 
   const pin = String(100000 + Math.floor(Math.random() * 900000));
   simpanPinRonda(pin);
@@ -105,15 +103,34 @@ function pulihkanAksesAdmin(username) {
   console.log('Password ini wajib diganti saat masuk. Kosongkan lagi PEMULIHAN_USERNAME.');
 }
 
+// Aman dijalankan ulang: pemicu lama dihapus dulu. Jalankan sekali setelah memperbarui kode dari versi
+// yang masih memakai pemicu bulanan.
 function pasangTrigger() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
-    if (['laporanOtomatisBulanan', 'cadanganMingguan'].indexOf(t.getHandlerFunction()) !== -1) {
+    if (['laporanOtomatisBulanan', 'laporanOtomatisHarian', 'cadanganMingguan'].indexOf(t.getHandlerFunction()) !== -1) {
       ScriptApp.deleteTrigger(t);
     }
   });
-  ScriptApp.newTrigger('laporanOtomatisBulanan').timeBased().onMonthDay(1).atHour(1).inTimezone(ZONA).create();
+  ScriptApp.newTrigger('laporanOtomatisHarian').timeBased().everyDays(1).atHour(5).inTimezone(ZONA).create();
   ScriptApp.newTrigger('cadanganMingguan').timeBased().onWeekDay(ScriptApp.WeekDay.SUNDAY).atHour(2)
     .inTimezone(ZONA).create();
+}
+
+// Menulis ulang semua tab laporan dengan format terbaru, misalnya setelah memperbarui kode.
+// Bulan tanpa transaksi dilewati; tab yang tidak lagi punya transaksi dihapus.
+function tulisUlangSemuaLaporan() {
+  const ss = bukaLaporan();
+  const periode = {};
+  hanyaAktif(bacaTab(TAB.TRANSAKSI)).forEach(function (t) { periode[periodeDari(t.tanggal)] = true; });
+  ss.getSheets().forEach(function (sh) {
+    const m = /^Laporan-(\d{4}-\d{2})$/.exec(sh.getName()) || /^Rekap-(\d{4})$/.exec(sh.getName());
+    if (!m) return;
+    const masihAda = Object.keys(periode).some(function (p) { return p.indexOf(m[1]) === 0; });
+    if (!masihAda) ss.deleteSheet(sh);
+  });
+  Object.keys(periode).sort().forEach(tulisLaporanBulanan);
+  tulisPetunjuk(ss);
+  console.log('Laporan ditulis ulang: ' + (Object.keys(periode).sort().map(namaPeriode).join(', ') || 'tidak ada'));
 }
 
 // Ukur lama hash sebelum rilis: targetnya di bawah 1 detik per login.
